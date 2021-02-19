@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -11,6 +14,7 @@ using StoreWebApp.Models;
 using StoreWebApp.Repository;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,12 +30,26 @@ namespace StoreWebApp
         public IConfiguration Configuration { get; }
 
         //For CORS Origins
-        //string AllowOrigins = "http://localhost:4200";
+        //string AllowOrigins = "*";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //To Prevent The Multi Part Body Length Error
+            services.Configure<FormOptions>(f =>
+            {
+                f.ValueLengthLimit = int.MaxValue;
+                f.MultipartBodyLengthLimit = int.MaxValue;
+                f.MemoryBufferThreshold = int.MaxValue;
+            });
+
             services.AddControllers();
+
+            //services.AddControllers().AddJsonOptions(options =>
+            //{
+            //    options.JsonSerializerOptions.PropertyNamingPolicy = null;
+            //    options.JsonSerializerOptions.DictionaryKeyPolicy = null;
+            //});
 
             //string connect = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<StoreDbContext>(options =>
@@ -54,6 +72,7 @@ namespace StoreWebApp
 
             services.AddCors();
 
+            #region To Allow Origins CORS
             //To Allow Origins CORS
             //services.AddCors(options =>
             //{
@@ -74,6 +93,8 @@ namespace StoreWebApp
             //                builder.WithOrigins("http:/localhost:4200");
             //            });
             //});
+            #endregion
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,7 +116,15 @@ namespace StoreWebApp
             //    options.WithOrigins(AllowOrigins).AllowAnyMethod().AllowAnyHeader());
 
             app.UseCors(options =>
-                options.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader());
+                options.WithOrigins("http://localhost:4200")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+
+            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions { 
+                FileProvider = new PhysicalFileProvider (Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
+                RequestPath = new PathString("/Resources")
+            });
 
             app.UseOpenApi();
             app.UseSwaggerUi3();

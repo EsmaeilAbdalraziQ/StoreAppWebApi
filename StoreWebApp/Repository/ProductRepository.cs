@@ -19,6 +19,7 @@ namespace StoreWebApp.Repository
         {
             var products = _db.Products.ToList();
 
+
             return products;
         }
 
@@ -41,26 +42,30 @@ namespace StoreWebApp.Repository
         {
             var Editedproduct = _db.Products.FirstOrDefault(f => f.ProductId == product.ProductId);
 
-            if (Editedproduct != null)
-            {
-                _db.Entry(product).State = EntityState.Modified;
-                Editedproduct.LastUpdated = DateTime.Now;
+            //if (Editedproduct != null)
+            //{
+            //    _db.Entry(product).State = EntityState.Modified;
+            //    Editedproduct.LastUpdated = DateTime.Now;
 
-                //Editedproduct.ProductName = product.ProductName;
-                //Editedproduct.ProductPrice = product.ProductPrice;
-                //Editedproduct.LastUpdated = product.LastUpdated;
-                //Editedproduct.Photo = product.Photo;
+            Editedproduct.ProductName = product.ProductName;
+            Editedproduct.ProductPrice = product.ProductPrice;
+            Editedproduct.LastUpdated = DateTime.Now;
 
-                _db.SaveChanges();
-            }
+            //Editedproduct.Photo = product.Photo;
+
+            _db.SaveChanges();
+            //}
         }
 
         public bool DeleteProduct(int id)
         {
             var product = _db.Products.Find(id);
             _db.Products.Remove(product);
+            _db.SaveChanges();
 
             return true;
         }
+
+        
     }
 }

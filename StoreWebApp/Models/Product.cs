@@ -18,9 +18,6 @@ namespace StoreWebApp.Models
         [Required]
         public decimal? ProductPrice { get; set; }
         public DateTime LastUpdated { get; set; }
-        
-        //[ForeignKey("Photo")]
-        //public int? PhotoId { get; set; }
-        //public Photo Photo { get; set; }
+        public string PhotoPath { get; set; }
     }
 }

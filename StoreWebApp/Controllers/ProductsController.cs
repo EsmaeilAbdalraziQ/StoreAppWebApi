@@ -21,7 +21,7 @@ namespace StoreWebApp.Controllers
             _context = context;
             _product = product;
         }
-
+        //------------------------------------------------------------------
         #region GetProductsList
         // GET: api/Products
         [HttpGet("/api/products")]
@@ -39,10 +39,10 @@ namespace StoreWebApp.Controllers
             }
         }
         #endregion
-
+        //------------------------------------------------------------------
         #region GetProductById
         // GET: api/Products/5
-        [HttpGet("/api/Products/{id}")]
+        [HttpGet("{id}")]
         public ActionResult GetProductById(int id)
         {
             try
@@ -57,10 +57,31 @@ namespace StoreWebApp.Controllers
             }
         }
         #endregion
-
+        //------------------------------------------------------------------
+        #region PostProduct
+        // POST: api/Products
+        //[HttpPost("PostProduct")]
+        [HttpPost]
+        public ActionResult PostProduct(Product product)
+        {
+            try
+            {
+                //Console.WriteLine(product);
+                _product.AddProduct(product);
+                //return new JsonResult(true);
+                return CreatedAtAction("GetProducts", new { id = product.ProductId }, product);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return new JsonResult(false);
+            }
+        }
+        #endregion
+        //------------------------------------------------------------------
         #region PutProduct
         // PUT: api/Products/5
-        [HttpPut("/api/Products/{id}")]
+        [HttpPut("{id}")]
         public ActionResult PutProduct(int id, Product product)
         {
             if (id != product.ProductId)
@@ -68,41 +89,25 @@ namespace StoreWebApp.Controllers
                 return new JsonResult("Product Id not valid");
             }
 
+            _product.EditProduct(product);
+
             try
             {
-                _product.EditProduct(product);
-
                 return new JsonResult(true);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return new JsonResult(false);
             }
+
+            return new JsonResult(false);
+            
         }
         #endregion
-
-        #region PostProduct
-        // POST: api/Products
-        [HttpPost("PostProduct")]
-        public ActionResult PostProduct(Product product)            
-        {
-            try
-            {
-                _product.AddProduct(product);
-                return new JsonResult(true);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return new JsonResult(false);
-            }
-        }
-        #endregion
-
+        //------------------------------------------------------------------
         #region DeleteProduct
         // DELETE: api/Products/5
-        [HttpDelete("/api/Products/{id}")]
+        [HttpDelete("{id}")]
         public ActionResult DeleteProduct(int id)
         {
             try
@@ -117,5 +122,6 @@ namespace StoreWebApp.Controllers
             }
         }
         #endregion
+        //------------------------------------------------------------------
     }
 }
